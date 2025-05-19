@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>React Calculator</title>
+<style>
+  body {
+    background: #282c34;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  .calculator {
+    background: #3b3f48;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    width: 320px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .display {
+    background: #1e2128;
+    color: #fff;
+    font-size: 2.5rem;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: right;
+    user-select: none;
+    min-height: 60px;
+    overflow-x: auto;
+    box-shadow: inset 0 -5px 10px rgba(255,255,255,0.1);
+  }
+  .buttons {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  button {
+    background: #50575e;
+    border: none;
+    border-radius: 12px;
+    color: #e0e0e0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 20px 0;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    user-select: none;
+  }
+  button.operator {
+    background: #f57c00;
+    color: white;
+  }
+  button.operator:hover {
+    background: #e27600;
+  }
+  button.clear {
+    background: #d32f2f;
+    color: white;
+  }
+  button.clear:hover {
+    background: #b22a2a;
+  }
+  button.equal {
+    background: #388e3c;
+    color: white;
+    grid-column: span 2;
+  }
+  button.equal:hover {
+    background: #2c6f2a;
+  }
+  button:hover:not(.operator):not(.clear):not(.equal) {
+    background: #6c757d;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+function Calculator() {
+  const [input, setInput] = useState('');
+
+  // Helper function to safely evaluate arithmetic expressions
+  function evaluateExpression(expr) {
+    try {
+      // Using Function constructor for evaluation after validation
+      // Validate expression only contains numbers, operators, and dots
+      if (!/^[0-9+\-*/.() ]+$/.test(expr)) {
+        return 'Error';
+      }
+      // eslint-disable-next-line no-new-func
+      const result = Function('"use strict";return (' + expr + ')')();
+      return Number.isFinite(result) ? result : 'Error';
+    } catch {
+      return 'Error';
+    }
+  }
+
+  function handleClick(value) {
+    if (value === 'C') {
+      setInput('');
+    } else if (value === '=') {
+      const result = evaluateExpression(input);
+      setInput(String(result));
+    } else {
+      // Prevent multiple operators in a row and invalid input
+      const operators = ['+', '-', '*', '/'];
+      const lastChar = input.slice(-1);
+      if (operators.includes(value)) {
+        if (input === '' || operators.includes(lastChar)) {
+          // Do not allow operator as first char or multiple ops in a row
+          return;
+        }
+      }
+      setInput(input + value);
+    }
+  }
+
+  const buttonValues = [
+    '7', '8', '9', '/',
+    '4', '5', '6', '*',
+    '1', '2', '3', '-',
+    '0', '.', 'C', '+',
+  ];
+
+  return (
+    <div className="calculator" role="main" aria-label="Calculator">
+      <div className="display" aria-live="assertive" aria-atomic="true" tabIndex="0">{input || '0'}</div>
+      <div className="buttons">
+        {buttonValues.map((btn) => (
+          <button
+            key={btn}
+            className={btn === 'C' ? 'clear' : (['/', '*', '-', '+'].includes(btn) ? 'operator' : '')}
+            onClick={() => handleClick(btn)}
+            aria-label={btn === 'C' ? 'Clear' : btn === '.' ? 'Decimal point' : btn}
+          >
+            {btn}
+          </button>
+        ))}
+        <button className="equal" onClick={() => handleClick('=')} aria-label="Equals">=</button>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<Calculator />);
+</script>
+</body>
+</html>
+
