@@ -1,0 +1,28 @@
+.container {
+  /* background-color: aqua; */
+  padding: 40px;
+  display: flex;
+  justify-content: center; /* Center the content */
+  width: 50%; /* Adjust the width */
+  margin-top: 50px;
+  text-align: center;
+}
+.g-div {
+  background-color: blueviolet;
+  padding: 25px;
+  width: 250px;
+  
+  text-align: center;
+
+
+  /* text-align: center; */
+
+
+  }
+  .p-div {
+    background-color: blue;
+        width: 155px;
+        margin-left: 150x;
+        padding: 20px;
+  }
+
